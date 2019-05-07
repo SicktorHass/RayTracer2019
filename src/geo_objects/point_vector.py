@@ -8,12 +8,10 @@ class Point3D(object):
         self.x = np.double(coord_tup[0])
         self.y = np.double(coord_tup[1])
         self.z = np.double(coord_tup[2])
-        #self.coords = np.nd
 
     def __repr__(self):
         return "({}, {}, {})".format(self.x, self.y, self.z)
 
-    # evtl. nicht ständig neue vektoren erzeugen
     def __add__(self, vec):
         assert(isinstance(vec, Vector3D))
         return Point3D((
@@ -59,7 +57,6 @@ class Vector3D(object):
 
     def __truediv__(self, scalar):
         s = np.double(scalar)
-        # TODO eventuell problematische division
         return Vector3D((self.x/s, self.y/s, self.z/s))
 
     def __mod__(self, other):

@@ -12,4 +12,19 @@ class Triangle(GeoObject):
         self.material = material
 
     def intersection_param(self, ray):
-        pass
+        p = self.a.vector_to(ray.origin)
+        dw = ray.direction % self.w
+        dwu = dw * self.u
+
+        if dwu == 0:
+            return None
+        pu = p % self.u
+        r = dw * p / dwu
+        s = pu * ray.direction / dwu
+        if 0 <= r and r <= 1 and 0 <= s and s <= 1 and r+s <= 1:
+            return pu * self.w / dwu
+        else:
+            return None
+
+    def normal_vec_at(self, p):
+        return (self.u % self.w).normalize()
