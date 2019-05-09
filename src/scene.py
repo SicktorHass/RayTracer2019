@@ -15,7 +15,7 @@ import time
 # -- Camera --
 C_LOC = (0, 8, -10)
 C_CENTER = (0, 5, 5)
-C_UP = (0, 6, 0)
+C_UP = (0, 1, 0)
 # -- Colors --
 RED = (1., 0., 0.)
 GREEN = (0., 1., 0.)
@@ -39,8 +39,8 @@ tr1 = Triangle((-3, 0, 5), (-1, 0, 6), (-2, 2, 5), p.Phong(PURPLE))
 tr2 = Triangle((3, 0, 5), (1, 0, 6), (2, 2, 5), p.Phong(CYAN))
 OBJECTS = [pl, s1, s2, s3, tr1, tr2, biggi]
 # -- Image --
-IMAGEWIDTH = 1000
-IMAGEHEIGHT = 1000
+IMAGEWIDTH = 400
+IMAGEHEIGHT = 400
 
 
 class World(object):
@@ -50,22 +50,20 @@ class World(object):
         self.objects = OBJECTS
         self.renderer = PrimitiveRenderer(self.camera, self.objects, self.light, (IMAGEWIDTH, IMAGEHEIGHT))
 
-    def render_scene(self):
-        t1 = threading.Thread(target=self.renderer.start_render, args=(0,), daemon=True)
-        t2 = threading.Thread(target=self.renderer.start_render, args=(1,), daemon=True)
-        t3 = threading.Thread(target=self.renderer.start_render, args=(2,), daemon=True)
-        t4 = threading.Thread(target=self.renderer.start_render, args=(3,), daemon=True)
+    def render_scene_multi(self):
+        t1 = threading.Thread(target=self.renderer.start_render, args=(0, 2), daemon=True)
+        t2 = threading.Thread(target=self.renderer.start_render, args=(1, 2), daemon=True)
         print('starting rendering threads')
         t1.start()
         t2.start()
-        t3.start()
-        t4.start()
-        while (not t1._is_stopped) and (not t2._is_stopped) and (not t3._is_stopped) and (not t4._is_stopped):
+        while (not t1._is_stopped) and (not t2._is_stopped):
             print('rendering...')
             print(t1)
             print(t2)
-            print(t3)
-            print(t4)
             time.sleep(5)
         print('all threads are ready!')
+        return self.renderer.image
+    
+    def render_scene_single(self):
+        self.renderer.start_render(start=0, offset=1)
         return self.renderer.image

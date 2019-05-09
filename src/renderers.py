@@ -1,9 +1,8 @@
 from PIL import Image
 from geo_objects.geo_base import Ray
-import math as m
-import threading
+
 BACKGROUND_COLOR = (0, 0, 0)
-EPSILON = 0.0001
+EPSILON = 0.000001
 
 
 class PrimitiveRenderer(object):
@@ -14,8 +13,8 @@ class PrimitiveRenderer(object):
         self.image = Image.new('RGB', (resolution[0], resolution[1]), BACKGROUND_COLOR)
         self.max_level = 3
 
-    def start_render(self, start):
-        for y in range(start, self.image.height, 4):
+    def start_render(self, start, offset):
+        for y in range(start, self.image.height, offset):
             for x in range(self.image.width):
                 ray = self.cast_cam_ray(x, y)
                 color = self.trace_ray(1, ray)
@@ -66,8 +65,10 @@ class PrimitiveRenderer(object):
     def cast_shadow(self, hitpoint_data, direct_color):
         light_ray = Ray(hitpoint_data['hitpoint'], hitpoint_data['l'])
         for o in self.objects:
-            if o is hitpoint_data['hitobj']:
+
+            if o is hitpoint_data['hitobj']:  # skip self shadowing, since its too edgy
                 continue
+
             hit = o.intersection_param(light_ray)
 
             # 16.4 THE EPSILON FACTOR -SALT AND PEPPER NOISE
@@ -82,7 +83,7 @@ class PrimitiveRenderer(object):
 
             if hit:     # no direct light at this point
                 if hit > -EPSILON:
-                    return tuple(map(lambda x: x*0.5, direct_color))
+                    return tuple(map(lambda x: x*0.4, direct_color))
         return direct_color
 
     def cast_cam_ray(self, x, y):
